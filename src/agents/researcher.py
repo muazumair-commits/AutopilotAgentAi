@@ -62,7 +62,7 @@ class ResearcherModule:
         from src.utils import generate_with_retry
         response = generate_with_retry(
             model_client=self.gemini,
-            model_id="gemini-1.5-flash",
+            model_id="gemini-1.5-flash-001",
             contents=prompt,
             config=types.GenerateContentConfig(
                 tools=[types.Tool(google_search=types.GoogleSearch())]
