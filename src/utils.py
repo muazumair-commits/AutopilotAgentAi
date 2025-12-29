@@ -2,7 +2,7 @@ import time
 import random
 from google.genai import errors
 
-def generate_with_retry(model_client, model_id, contents, config=None, retries=3, base_delay=2):
+def generate_with_retry(model_client, model_id, contents, config=None, retries=10, base_delay=3):
     """
     Wraps model.generate_content with an exponential backoff retry mechanism.
     Handles 429 Resource Exhausted errors specifically.
