@@ -36,7 +36,7 @@ def writer_agent(state: AgentState):
         )
         draft_sections[topic] = response.text
         import time
-        time.sleep(5) # Increased delay for rate limits
+        time.sleep(2) # Reduced delay, relying on retry logic
         
     print("✍️ WRITER: Drafting complete.")
     return {"draft_sections": draft_sections}

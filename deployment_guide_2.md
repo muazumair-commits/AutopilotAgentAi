@@ -70,11 +70,15 @@ git push -u origin main
 The app will **crash** immediately looking for your API keys. You must add them manually.
 
 1.  On your deployed app's screen, click **"Manage app"** (bottom right) -> the **three dots** (settings) -> **Settings** -> **Secrets**.
-2.  Paste your keys exactly like this (Toml format):
 
-```toml
-GEMINI_API_KEY = "Your_Gemini_Key_Here"
-SERPAPI_API_KEY = "Your_SerpAPI_Key_Here"
-```
+2.  Paste your keys exactly like this (Toml format). **IMPORTANT: Make sure to wrap your actual keys in double quotes `""` and do NOT copy the triple backticks**:
+
+    ```toml
+    GEMINI_API_KEY = "Your_actual_Gemini_key_starts_with_AIza..."
+    SERPAPI_API_KEY = "Your_actual_SerpAPI_key_here"
+    ```
+
+    *Example of what it should look like inside the box:*
+    `GEMINI_API_KEY = "AIzaSyD..."`
 
 3.  Click **Save**. The app will restart and work perfectly!

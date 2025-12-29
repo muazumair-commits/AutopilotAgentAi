@@ -17,17 +17,24 @@ class ResearcherModule:
             "api_key": self.serpapi_key,
             "num": 5
         }
-        search = GoogleSearch(params)
-        results = search.get_dict()
-        organic = results.get("organic_results", [])
-        
-        # Simple synthesis
-        content = ""
-        for res in organic:
-            title = res.get("title", "")
-            snippet = res.get("snippet", "")
-            link = res.get("link", "")
-            content += f"Source: {title} ({link})\nSummary: {snippet}\n---\n"
+        try:
+            search = GoogleSearch(params)
+            results = search.get_dict()
+            organic = results.get("organic_results", [])
+            
+            # Simple synthesis
+            content = ""
+            for res in organic:
+                title = res.get("title", "")
+                snippet = res.get("snippet", "")
+                link = res.get("link", "")
+                content += f"Source: {title} ({link})\nSummary: {snippet}\n---\n"
+                
+            if not content:
+                content = "No search results found."
+        except Exception as e:
+            print(f"⚠️ SerpAPI Error: {e}")
+            content = f"Error during search: {e}"
             
         return content
 

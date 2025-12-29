@@ -44,27 +44,31 @@ if st.button("Start Research"):
         with st.status("Running Agent Pipeline...", expanded=True) as status:
             # Stream the graph execution
             # LangGraph stream returns events
-            for event in app.stream(initial_state):
-                for node, output in event.items():
-                    if node == "planner":
-                        st.write("✅ **Planner**: Research plan created.")
-                        with st.expander("View Plan"):
-                            st.write(output.get("research_plan", []))
-                    
-                    elif node == "researcher":
-                        st.write("✅ **Researcher**: Data gathered.")
-                        with st.expander("View Research Data"):
-                            st.write(output.get("research_data", {}).keys())
-                            
-                    elif node == "writer":
-                        st.write("✅ **Writer**: Sections drafted.")
-                    
-                    elif node == "editor":
-                        st.write("✅ **Editor**: Final report compiled.")
-                        # This works because editor outputs final_report
-                        final_report = output.get("final_report", "")
+            try:
+                for event in app.stream(initial_state):
+                    for node, output in event.items():
+                        if node == "planner":
+                            st.write("✅ **Planner**: Research plan created.")
+                            with st.expander("View Plan"):
+                                st.write(output.get("research_plan", []))
+                        
+                        elif node == "researcher":
+                            st.write("✅ **Researcher**: Data gathered.")
+                            with st.expander("View Research Data"):
+                                st.write(output.get("research_data", {}).keys())
+                                
+                        elif node == "writer":
+                            st.write("✅ **Writer**: Sections drafted.")
+                        
+                        elif node == "editor":
+                            st.write("✅ **Editor**: Final report compiled.")
+                            # This works because editor outputs final_report
+                            final_report = output.get("final_report", "")
 
-            status.update(label="Research Complete!", state="complete", expanded=False)
+                status.update(label="Research Complete!", state="complete", expanded=False)
+            except Exception as e:
+                st.error(f"An error occurred: {e}")
+                status.update(label="Error Occurred", state="error", expanded=True)
             
         # Display Report
         st.divider()

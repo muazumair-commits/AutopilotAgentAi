@@ -2,7 +2,7 @@ import time
 import random
 from google.genai import errors
 
-def generate_with_retry(model_client, model_id, contents, config=None, retries=10, base_delay=15):
+def generate_with_retry(model_client, model_id, contents, config=None, retries=3, base_delay=2):
     """
     Wraps model.generate_content with an exponential backoff retry mechanism.
     Handles 429 Resource Exhausted errors specifically.
@@ -29,8 +29,8 @@ def generate_with_retry(model_client, model_id, contents, config=None, retries=1
                 # Re-raise other client errors
                 raise e
         except Exception as e:
-            # Catch-all for other potential transient network issues, but be careful not to hide real bugs
-            print(f"⚠️ Unexpected error: {e}. Retrying...")
-            time.sleep(5)
+            # Catch-all for other potential transient network issues
+            print(f"⚠️ Unexpected error: {e}. Retrying... (Attempt {attempt+1}/{retries})")
+            time.sleep(2)
     
-    raise Exception("Max retries exceeded for Gemini API call.")
+    raise Exception(f"Failed to generate content after {retries} attempts.")
