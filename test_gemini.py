@@ -12,7 +12,7 @@ if not api_key:
 
 client = genai.Client(api_key=api_key)
 
-models_to_test = ["gemini-1.5-flash-001", "gemini-1.5-flash", "gemini-flash-latest"]
+models_to_test = ["gemini-2.0-flash-exp", "gemini-1.5-flash-8b", "gemini-1.5-flash"]
 
 print("Testing Gemini Models...")
 for model in models_to_test:

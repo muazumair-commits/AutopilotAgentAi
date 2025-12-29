@@ -34,7 +34,7 @@ def planner_agent(state: AgentState):
         from src.utils import generate_with_retry
         response = generate_with_retry(
             model_client=client,
-            model_id="gemini-flash-latest",
+            model_id="gemini-1.5-flash-8b",
             contents=prompt
         )
     except Exception as e:
