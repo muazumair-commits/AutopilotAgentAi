@@ -1,0 +1,9 @@
+langgraph
+langchain-google-genai
+langchain-community
+google-search-results
+youtube-transcript-api
+streamlit
+pypdf
+python-dotenv
+google-genai
