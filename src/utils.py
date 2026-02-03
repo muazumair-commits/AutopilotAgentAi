@@ -1,36 +1,55 @@
+import os
 import time
-import random
-from google.genai import errors
+from bytez import Bytez
 
-def generate_with_retry(model_client, model_id, contents, config=None, retries=10, base_delay=3):
+def generate_with_bytez(prompt, model_id="google/gemini-2.5-flash-lite", system_message=None, max_tokens=2048):
     """
-    Wraps model.generate_content with an exponential backoff retry mechanism.
-    Handles 429 Resource Exhausted errors specifically.
+    Generate content using the official Bytez SDK.
     """
-    for attempt in range(retries):
-        try:
-            if config:
-                return model_client.models.generate_content(
-                    model=model_id,
-                    contents=contents,
-                    config=config
-                )
-            else:
-                return model_client.models.generate_content(
-                    model=model_id,
-                    contents=contents
-                )
-        except errors.ClientError as e:
-            if e.code == 429 or e.status == 'RESOURCE_EXHAUSTED':
-                sleep_time = (base_delay * (2 ** attempt)) + random.uniform(0, 1)
-                print(f"⚠️ Quota exceeded. Retrying in {sleep_time:.2f}s... (Attempt {attempt+1}/{retries})")
-                time.sleep(sleep_time)
-            else:
-                # Re-raise other client errors
-                raise e
-        except Exception as e:
-            # Catch-all for other potential transient network issues
-            print(f"⚠️ Unexpected error: {e}. Retrying... (Attempt {attempt+1}/{retries})")
-            time.sleep(2)
+    api_key = os.getenv("BYTEZ_API_KEY")
+    if not api_key:
+        raise ValueError("BYTEZ_API_KEY not found in environment variables")
+
+    sdk = Bytez(api_key)
+    model = sdk.model(model_id)
     
-    raise Exception(f"Failed to generate content after {retries} attempts.")
+    messages = []
+    if system_message:
+        messages.append({"role": "system", "content": system_message})
+    messages.append({"role": "user", "content": prompt})
+    
+    # Send input to model with retries
+    max_retries = 3
+    for attempt in range(max_retries):
+        try:
+            results = model.run(messages)
+            
+            if results.error:
+                error_msg = f"Bytez SDK Error (Attempt {attempt+1}/{max_retries}): {results.error}"
+                print(f"[BYTEZ ERROR] {error_msg}")
+                # Save error to file for debugging
+                with open("bytez_error_log.txt", "a", encoding="utf-8") as f:
+                    f.writelines([f"\n--- {time.ctime()} ---\n", str(results.error), "\n"])
+                
+                if attempt < max_retries - 1:
+                    time.sleep(5 * (attempt + 1))
+                    continue
+                else:
+                    raise Exception(f"Bytez SDK Error: {results.error}")
+            
+            # Extract content from the message object/dict
+            output = results.output
+            if isinstance(output, dict) and "content" in output:
+                return output["content"]
+            elif isinstance(output, list) and len(output) > 0:
+                if isinstance(output[0], dict) and "content" in output[0]:
+                    return output[0]["content"]
+                    
+            return str(output)
+            
+        except Exception as e:
+            print(f"[BYTEZ EXCEPTION] (Attempt {attempt+1}/{max_retries}): {str(e).encode('ascii', 'ignore').decode()}")
+            if attempt < max_retries - 1:
+                time.sleep(5 * (attempt + 1))
+            else:
+                raise e

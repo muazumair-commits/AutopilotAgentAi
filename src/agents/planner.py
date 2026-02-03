@@ -1,6 +1,6 @@
 import os
-from google import genai
 from src.state import AgentState
+from src.utils import generate_with_bytez
 
 def planner_agent(state: AgentState):
     """
@@ -8,16 +8,9 @@ def planner_agent(state: AgentState):
     """
     print(f"🧠 PLANNER: Analyzing topic '{state['topic']}'...")
     
-    # Ensure API Key is loaded
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        print("❌ PLANNER: GEMINI_API_KEY not found in environment.")
-    
-    client = genai.Client(api_key=api_key)
+    system_msg = "You are a Senior Market Research Planner."
     
     prompt = f"""
-    You are a Senior Market Research Planner.
-    
     TOPIC: {state['topic']}
     
     Goal: Create a research plan to write a comprehensive 10-page market report.
@@ -31,18 +24,18 @@ def planner_agent(state: AgentState):
     """
     
     try:
-        from src.utils import generate_with_retry
-        response = generate_with_retry(
-            model_client=client,
-            model_id="gemini-1.5-flash-8b",
-            contents=prompt
+        response_text = generate_with_bytez(
+            model_id="google/gemini-2.5-flash-lite",
+            prompt=prompt,
+            system_message=system_msg,
+            max_tokens=1024
         )
     except Exception as e:
         print(f"❌ PLANNER Error: {e}")
         return {"research_plan": []}
     
     # Simple parsing: split by newlines and clean up
-    plan = [line.strip().strip("- ") for line in response.text.strip().split("\n") if line.strip()]
+    plan = [line.strip().strip("- ") for line in response_text.strip().split("\n") if line.strip()]
     
     print(f"🧠 PLANNER: Created plan with {len(plan)} items.")
     return {"research_plan": plan}

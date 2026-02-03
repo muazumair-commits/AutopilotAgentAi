@@ -1,13 +1,11 @@
 import os
 import time
-from google import genai
-from google.genai import types
 from serpapi import GoogleSearch
 from src.state import AgentState
+from src.utils import generate_with_bytez
 
 class ResearcherModule:
     def __init__(self):
-        self.gemini = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
         self.serpapi_key = os.getenv("SERPAPI_API_KEY")
 
     def search_web(self, query):
@@ -42,13 +40,12 @@ class ResearcherModule:
         # 1. Gather raw data
         raw_data = self.search_web(subtopic)
         
-        # 2. Synthesize with Gemini Grounding for extra verify
-        # We use the raw data + asking Gemini to use its tools
+        # 2. Synthesize with Bytez-powered Gemini
         print(f"  🤖 analyzing data for: {subtopic}")
         
-        prompt = f"""
-        You are a Market Researcher.
+        system_msg = "You are a Market Researcher."
         
+        prompt = f"""
         SUB-TOPIC: {subtopic}
         
         RAW SEARCH CONTEXT:
@@ -59,16 +56,13 @@ class ResearcherModule:
         updated with the search results.
         """
         
-        from src.utils import generate_with_retry
-        response = generate_with_retry(
-            model_client=self.gemini,
-            model_id="gemini-1.5-flash-8b",
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                tools=[types.Tool(google_search=types.GoogleSearch())]
-            )
+        response_text = generate_with_bytez(
+            model_id="google/gemini-2.5-flash-lite",
+            prompt=prompt,
+            system_message=system_msg,
+            max_tokens=2048
         )
-        return response.text
+        return response_text
 
 def researcher_agent(state: AgentState):
     """

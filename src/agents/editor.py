@@ -1,6 +1,6 @@
 import os
-from google import genai
 from src.state import AgentState
+from src.utils import generate_with_bytez
 
 def editor_agent(state: AgentState):
     """
@@ -8,16 +8,14 @@ def editor_agent(state: AgentState):
     """
     print("📝 EDITOR: Compiling final report...")
     
-    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
-    
     # Combine all drafts
     full_draft = ""
     for topic, content in state["draft_sections"].items():
         full_draft += f"\n\n## {topic}\n\n{content}"
-        
-    prompt = f"""
-    You are the Chief Editor of a Market Research Firm.
     
+    system_msg = "You are the Chief Editor of a Market Research Firm."
+    
+    prompt = f"""
     TOPIC: {state['topic']}
     
     FULL DRAFT:
@@ -33,12 +31,12 @@ def editor_agent(state: AgentState):
     Return the complete Markdown report.
     """
     
-    from src.utils import generate_with_retry
-    response = generate_with_retry(
-        model_client=client,
-        model_id="gemini-1.5-flash-8b",
-        contents=prompt
+    response_text = generate_with_bytez(
+        model_id="google/gemini-2.5-flash-lite",
+        prompt=prompt,
+        system_message=system_msg,
+        max_tokens=4096
     )
     
     print("📝 EDITOR: Final report generated.")
-    return {"final_report": response.text}
+    return {"final_report": response_text}

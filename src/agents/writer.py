@@ -1,6 +1,7 @@
 import os
-from google import genai
+import time
 from src.state import AgentState
+from src.utils import generate_with_bytez
 
 def writer_agent(state: AgentState):
     """
@@ -8,14 +9,13 @@ def writer_agent(state: AgentState):
     """
     print("✍️ WRITER: Drafting sections...")
     
-    client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
     draft_sections = {}
+    system_msg = "You are an Expert Market Analyst."
     
     for topic, research in state["research_data"].items():
         print(f"  ✍️ writing section: {topic}")
-        prompt = f"""
-        You are an Expert Market Analyst.
         
+        prompt = f"""
         SECTION TOPIC: {topic}
         
         RESEARCH NOTES:
@@ -28,15 +28,14 @@ def writer_agent(state: AgentState):
         - Do NOT include a generic conclusion at the end of every section.
         """
         
-        from src.utils import generate_with_retry
-        response = generate_with_retry(
-            model_client=client,
-            model_id="gemini-1.5-flash-8b",
-            contents=prompt
+        response_text = generate_with_bytez(
+            model_id="google/gemini-2.5-flash-lite",
+            prompt=prompt,
+            system_message=system_msg,
+            max_tokens=2048
         )
-        draft_sections[topic] = response.text
-        import time
-        time.sleep(2) # Reduced delay, relying on retry logic
+        draft_sections[topic] = response_text
+        time.sleep(2)
         
     print("✍️ WRITER: Drafting complete.")
     return {"draft_sections": draft_sections}

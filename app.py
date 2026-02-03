@@ -9,13 +9,13 @@ load_dotenv()
 st.set_page_config(page_title="AI Market Researcher", page_icon="🕵️")
 
 st.title("🕵️ Autonomous Market Research Agent")
-st.write("Powered by LangGraph, SerpAPI, and Gemini Flash Latest")
+st.write("Powered by LangGraph, SerpAPI, and Gemini 2.5 Flash Lite (via Bytez)")
 
 # Sidebar for inputs (masked keys if not in env)
 with st.sidebar:
     st.header("Configuration")
-    if not os.getenv("GEMINI_API_KEY"):
-        os.environ["GEMINI_API_KEY"] = st.text_input("Gemini API Key", type="password")
+    if not os.getenv("BYTEZ_API_KEY"):
+        os.environ["BYTEZ_API_KEY"] = st.text_input("Bytez API Key", type="password")
     if not os.getenv("SERPAPI_API_KEY"):
         os.environ["SERPAPI_API_KEY"] = st.text_input("SerpAPI Key", type="password")
 
