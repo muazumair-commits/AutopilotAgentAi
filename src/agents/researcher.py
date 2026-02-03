@@ -57,7 +57,7 @@ class ResearcherModule:
         """
         
         response_text = generate_with_bytez(
-            model_id="google/gemini-2.0-flash-exp",
+            model_id="google/gemini-2.5-pro",
             prompt=prompt,
             system_message=system_msg,
             max_tokens=2048
