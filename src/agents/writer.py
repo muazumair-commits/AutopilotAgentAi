@@ -29,7 +29,7 @@ def writer_agent(state: AgentState):
         """
         
         response_text = generate_with_bytez(
-            model_id="google/gemini-1.5-flash",
+            model_id="google/gemini-2.0-flash-exp",
             prompt=prompt,
             system_message=system_msg,
             max_tokens=2048
