@@ -2,7 +2,7 @@ import os
 import time
 from bytez import Bytez
 
-def generate_with_bytez(prompt, model_id="google/gemini-2.5-pro", system_message=None, max_tokens=2048):
+def generate_with_bytez(prompt, model_id="google/gemini-2.5-flash", system_message=None, max_tokens=2048):
     """
     Generate content using the official Bytez SDK.
     """

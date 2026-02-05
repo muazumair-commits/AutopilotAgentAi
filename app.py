@@ -9,7 +9,7 @@ load_dotenv()
 st.set_page_config(page_title="AI Market Researcher", page_icon="🕵️")
 
 st.title("🕵️ Autonomous Market Research Agent")
-st.write("Powered by LangGraph, SerpAPI, and Gemini 2.5 Pro (via Bytez)")
+st.write("Powered by LangGraph, SerpAPI, and Gemini 2.5 Flash (via Bytez)")
 
 # Sidebar for inputs (masked keys if not in env)
 with st.sidebar:

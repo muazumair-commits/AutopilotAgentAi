@@ -25,7 +25,7 @@ def planner_agent(state: AgentState):
     
     try:
         response_text = generate_with_bytez(
-            model_id="google/gemini-2.5-pro",
+            model_id="google/gemini-2.5-flash",
             prompt=prompt,
             system_message=system_msg,
             max_tokens=1024
